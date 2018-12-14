@@ -14,7 +14,7 @@ class SVMHandler():
         loader = CSVLoader()
         self.data, self.duration, self.label = loader.getData('bank-additional.csv')
 
-    def train_gd(self, batch_size=128, epoch=1000, c=1, gamma=0.1):
+    def train_gd(self, learning_rate=0.01, batch_size=128, epoch=1000, c=1, gamma=0.1):
         x = np.asarray(self.data, np.float32)
         y = np.asarray(self.label, np.float32)
         k = self.rbf_kernel(x, x, gamma)
@@ -77,8 +77,6 @@ class SVMHandler():
             b1 = -ee1 - y[idx1] * k[idx1][idx1] * (alpha1_new - alpha1_old) - y[idx2] * k[idx1][idx2] * (alpha2_new - alpha2_old)
             b2 = -ee2 - y[idx1] * k[idx1][idx2] * (alpha1_new - alpha1_old) - y[idx2] * k[idx2][idx2] * (alpha2_new - alpha2_old)
             self.b += (b1 + b2) * 0.5
-
-
 
     def pol_kernel(self, x, y, p):
         return (x.dot(y.T) + 1) ** p
