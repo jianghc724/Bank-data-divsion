@@ -4,15 +4,12 @@ import numpy as np
 class SVMHandler():
 
     def __init__(self):
-        self.data = None
-        self.label = None
-        self.duration = None
-        self.alpha = None
-        self.b = None
+        self.data = self.contact = self.duration = self.other = self.social = self.label = None
+        self.alpha = self.b = None
 
     def getData(self, path):
         loader = CSVLoader()
-        self.data, self.duration, self.label = loader.getData('bank-additional.csv')
+        self.data, self.contact, self.duration, self.other, self.social, self.label = loader.getData('bank-additional.csv')
 
     def train_gd(self, learning_rate=0.01, batch_size=128, epoch=1000, c=1, gamma=0.1):
         x = np.asarray(self.data, np.float32)

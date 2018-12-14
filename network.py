@@ -45,7 +45,7 @@ class OutputLayer():
 class Network():
 
     def __init__(self):
-        self.data = self.duration = self.label = None
+        self.data = self.contact = self.duration = self.other = self.social = self.label = None
         self.l1 = self.l2 = HiddenLayer()
         self.l3 = OutputLayer()
         self.l3.formerLayer = self.l2
@@ -53,7 +53,7 @@ class Network():
 
     def getData(self, path):
         loader = CSVLoader()
-        self.data, self.duration, self.label = loader.getData('bank-additional.csv')
+        self.data, self.contact, self.duration, self.other, self.social, self.label = loader.getData('bank-additional.csv')
 
     def train(self, learning_rate=0.01, batch_size=128, epoch=1000, c=1, gamma=0.1):
         x = np.asarray(self.data, np.float32)

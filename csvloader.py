@@ -4,7 +4,7 @@ job = ["admin.","blue-collar","entrepreneur","housemaid","management","retired",
 marital = ["divorced","married","single","unknown"]
 education = ["basic.4y","basic.6y","basic.9y","high.school","illiterate","professional.course","university.degree","unknown"]
 bool = ["no","yes","unknown"]
-contact = ["cellular","telephone"]
+con = ["cellular","telephone"]
 month = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
 day = ["mon","tue","wed","thu","fri"]
 poutcome = ["failure","nonexistent","success"]
@@ -15,13 +15,16 @@ class CSVLoader():
         pass
 
     def getData(self, path):
-        result = []
+        client = []
+        contact = []
+        social = []
+        other = []
         label = []
         duration = []
         with open(path, newline='') as f:
             freader = csv.reader(f, delimiter=';')
             for row in list(freader)[1:]:
-                row[0] = int(row[0])
+                row[0] = int(int(row[0]) / 10)
                 for i in range(0, len(job)):
                     if row[1] == job[i]:
                         row[1] = i
@@ -47,7 +50,7 @@ class CSVLoader():
                         row[6] = i
                         break
                 for i in range(0, len(contact)):
-                    if row[7] == contact[i]:
+                    if row[7] == con[i]:
                         row[7] = i
                         break
                 for i in range(0, len(month)):
@@ -58,29 +61,36 @@ class CSVLoader():
                     if row[9] == day[i]:
                         row[9] = i
                         break
-                duration.append(int(row[10]))
-                row[10] = int(row[11])
-                row[11] = int(row[12])
-                row[12] = int(row[13])
+                row[10] = int(row[10])
+                row[11] = int(row[11])
+                row[12] = int(row[12])
+                row[13] = int(row[13])
                 for i in range(0, len(poutcome)):
                     if row[14] == poutcome[i]:
-                        row[13] = i
+                        row[14] = i
                         break
-                row[14] = float(row[15])
-                row[15] = float(row[16])
-                row[16] = float(row[17])
-                row[17] = float(row[18])
-                row[18] = float(row[19])
+                row[15] = float(row[15])
+                row[16] = float(row[16])
+                row[17] = float(row[17])
+                row[18] = float(row[18])
+                row[19] = float(row[19])
+                client.append(row[0:7])
+                contact.append(row[7:10])
+                duration.append(row[10])
+                other.append(row[11:15])
+                social.append(row[15:20])
                 for i in range(0, len(bool)):
                     if row[20] == bool[i]:
                         label.append(i * 2 - 1)
                         break
-                result.append(row[:-2])
-        return result, duration, label
+        return client, contact, duration, other, social, label
 
 if __name__ == '__main__':
     csvloader = CSVLoader()
-    data, duration, label = csvloader.getData('bank-additional.csv')
-    print(data)
-    print(duration)
-    print(label)
+    data, contact, duration, other, social, label = csvloader.getData('bank-additional.csv')
+    # print(data)
+    # print(contact)
+    # print(duration)
+    # print(other)
+    # print(social)
+    # print(label)
