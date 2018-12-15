@@ -7,19 +7,24 @@ def sigmoid(x):
 class HiddenLayer():
 
     def __init__(self):
-        self.x = self.y = self.w = self.b = self.s = self.t = None
+        self.x = None
+        self.y = None
+        self.w = None
+        self.b = None
+        self.s = None
+        self.t = None
         self.formerLayer = None
 
-    def get_layer_sigmoid_gd(self, idx):
-        return self.t[idx].dot(self.w)
+    def get_layer_sigmoid_gd(self):
+        pass
 
-    def get_sigmoid_gd(self, idx):
-        return self.t[idx]
+    def get_sigmoid_gd(self):
+        pass
 
     def update(self):
         if self.formerLayer != None:
             self.x = self.formerLayer.s
-        self.y = self.x.dot(self.w) + self.b
+        self.y = (np.dot(self.w, self.x) + self.b).T
         self.s = sigmoid(self.y)
         self.t = self.s * (1 - self.s)
 
@@ -27,66 +32,87 @@ class HiddenLayer():
 class OutputLayer():
 
     def __init__(self):
-        self.x = self.y = self.w = self.b = None
+        self.x = None
+        self.y = None
+        self.w = None
+        self.b = None
         self.formerLayer = None
 
-    def get_layer_gd(self, idx):
-        return self.w * self.y[idx]
+    def get_layer_gd(self):
+        pass
 
-    def get_gd(self, idx):
-        return self.y[idx]
+    def get_gd(self):
+        pass
 
     def update(self):
         if self.formerLayer != None:
             self.x = self.formerLayer.s
-        self.y = self.x.dot(self.w) + self.b
+        self.y = (np.dot(self.w, self.x) + self.b).T
+        print(self.y)
 
 
 class Network():
 
     def __init__(self):
-        self.data = self.contact = self.duration = self.other = self.social = self.label = None
-        self.l1 = self.l2 = HiddenLayer()
-        self.l3 = OutputLayer()
-        self.l3.formerLayer = self.l2
+        self.data = None
+        self.t_data = None
+        self.contact = None
+        self.t_contact = None
+        self.duration = None
+        self.t_duration = None
+        self.other = None
+        self.t_other = None
+        self.social = None
+        self.t_social = None
+        self.label = None
+        self.t_label = None
+        self.l1 = HiddenLayer()
+        self.l2 = OutputLayer()
         self.l2.formerLayer = self.l1
+        self.l1.formerLayer = None
 
     def getData(self, path):
         loader = CSVLoader()
-        self.data, self.contact, self.duration, self.other, self.social, self.label = loader.getData('bank-additional.csv')
+        self.data, self.contact, self.duration, self.other, self.social, self.label, self.t_data, self.t_contact, self.t_duration, self.t_other, self.t_social, self.t_label = loader.getData('bank-additional.csv')
 
-    def train(self, learning_rate=0.01, batch_size=128, epoch=1000, c=1, gamma=0.1):
+    def train(self, learning_rate=0.01, epoch=1000):
         x = np.asarray(self.data, np.float32)
         y = np.asarray(self.label, np.float32)
-        self.l1.w = self.l2.w = self.l3.w = np.zeros(x.shape[1])
-        self.l1.b = self.l2.b = self.l3.b = 0.
+        y = y.reshape(x.shape[0], 1)
+        self.l1.w = np.zeros((x.shape[0], x.shape[0]))
+        self.l2.w = np.zeros((1, x.shape[1]))
+        self.l1.b = np.zeros((x.shape[0], x.shape[1]))
+        self.l2.b = np.zeros((1, x.shape[0]))
         self.l1.x = x
         for i in range(0, epoch):
-            y_pred = self.l3.y
-            idx = np.argmax(np.maximum(0, -y_pred * y))
-            if y[idx] * y_pred[idx] > 0:
-                break
-            delta1 = learning_rate * (self.l2.get_layer_sigmoid_gd(idx) * self.l1.get_sigmoid_gd(idx)).dot(self.l3.get_layer_gd(idx))
-            delta2 = learning_rate * self.l2.get_sigmoid_gd(idx).dot(self.l3.get_layer_gd(idx))
-            delta3 = learning_rate * self.l3.get_gd(idx)
-            self.l1.w += delta1 * self.l1.x[idx]
-            self.l1.b += delta1
-            self.l2.w += delta2 * self.l2.x[idx]
-            self.l2.b += delta2
-            self.l3.w += delta3 * self.l3.x[idx]
-            self.l3.b += delta3
+            print("Epoch:", i)
             self.l1.update()
             self.l2.update()
-            self.l3.update()
+            delta2 = self.l2.y.T - y.T
+            delta1 = np.dot(delta2.T, self.l2.w)
+            #print(delta1.shape, self.l1.t.shape)
+            self.l1.w -= learning_rate * (np.dot(delta1 * self.l1.t.T, self.l1.x.T))
+            self.l1.b -= learning_rate * (delta1 * self.l1.t.T)
+            self.l2.w -= learning_rate * np.dot(delta2, self.l1.y.T)
+            self.l2.b -= learning_rate * delta2
 
     def predict(self, _x):
-        x1 = np.asarray(_x, np.float32)
-        x2 = sigmoid(x1.dot(self.l1.w) + self.l1.b)
-        x3 = sigmoid(x2.dot(self.l2.w) + self.l2.b)
-        y_pred = x3.dot(self.l3.w) + self.l3.b
-        return y_pred
+        pass
+
+    def test(self):
+        n = len(self.t_data)
+        correct = 0
+        for i in range(0, n):
+            y = self.predict(self.t_data[i])
+            if y * self.t_label[i] > 0:
+                correct += 1
+        print("Total:", n)
+        print("Correct", correct)
+        print("Accuracy:", float(correct) / float(n))
 
 
 if __name__ == '__main__':
     n = Network()
     n.getData('bank-additional.csv')
+    n.train()
+    n.test()

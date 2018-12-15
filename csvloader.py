@@ -1,4 +1,5 @@
 import csv
+import random
 
 job = ["admin.","blue-collar","entrepreneur","housemaid","management","retired","self-employed","services","student","technician","unemployed","unknown"]
 marital = ["divorced","married","single","unknown"]
@@ -21,6 +22,12 @@ class CSVLoader():
         other = []
         label = []
         duration = []
+        t_client = []
+        t_contact = []
+        t_social = []
+        t_other = []
+        t_label = []
+        t_duration = []
         with open(path, newline='') as f:
             freader = csv.reader(f, delimiter=';')
             for row in list(freader)[1:]:
@@ -74,20 +81,31 @@ class CSVLoader():
                 row[17] = float(row[17])
                 row[18] = float(row[18])
                 row[19] = float(row[19])
-                client.append(row[0:7])
-                contact.append(row[7:10])
-                duration.append(row[10])
-                other.append(row[11:15])
-                social.append(row[15:20])
-                for i in range(0, len(bool)):
-                    if row[20] == bool[i]:
-                        label.append(i * 2 - 1)
-                        break
-        return client, contact, duration, other, social, label
+                if random.random() <= 0.7:
+                    client.append(row[0:7])
+                    contact.append(row[7:10])
+                    duration.append(row[10])
+                    other.append(row[11:15])
+                    social.append(row[15:20])
+                    for i in range(0, len(bool)):
+                        if row[20] == bool[i]:
+                            label.append(i * 2 - 1)
+                            break
+                else:
+                    t_client.append(row[0:7])
+                    t_contact.append(row[7:10])
+                    t_duration.append(row[10])
+                    t_other.append(row[11:15])
+                    t_social.append(row[15:20])
+                    for i in range(0, len(bool)):
+                        if row[20] == bool[i]:
+                            t_label.append(i * 2 - 1)
+                            break
+        return client, contact, duration, other, social, label, t_client, t_contact, t_duration, t_other, t_social, t_label
 
 if __name__ == '__main__':
     csvloader = CSVLoader()
-    data, contact, duration, other, social, label = csvloader.getData('bank-additional.csv')
+    data, contact, duration, other, social, label, t_client, t_contact, t_duration, t_other, t_social, t_label = csvloader.getData('bank-additional.csv')
     # print(data)
     # print(contact)
     # print(duration)
