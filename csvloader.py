@@ -15,7 +15,7 @@ class CSVLoader():
     def __init__(self):
         pass
 
-    def getData(self, path):
+    def getData(self, path, type=1):
         client = []
         contact = []
         social = []
@@ -30,6 +30,8 @@ class CSVLoader():
         t_duration = []
         with open(path, newline='') as f:
             freader = csv.reader(f, delimiter=';')
+            t = 0
+            f = 0
             for row in list(freader)[1:]:
                 row[0] = int(int(row[0]) / 10)
                 for i in range(0, len(job)):
@@ -82,25 +84,44 @@ class CSVLoader():
                 row[18] = float(row[18])
                 row[19] = float(row[19])
                 if random.random() <= 0.7:
-                    client.append(row[0:7])
-                    contact.append(row[7:10])
-                    duration.append(row[10])
-                    other.append(row[11:15])
-                    social.append(row[15:20])
                     for i in range(0, len(bool)):
                         if row[20] == bool[i]:
                             label.append(i * 2 - 1)
+                            client.append(row[0:7])
+                            contact.append(row[7:10])
+                            duration.append(row[10])
+                            other.append(row[11:15])
+                            social.append(row[15:20])
+                            if i == 1:
+                                t += 1
+                            else:
+                                f += 1
                             break
                 else:
-                    t_client.append(row[0:7])
-                    t_contact.append(row[7:10])
-                    t_duration.append(row[10])
-                    t_other.append(row[11:15])
-                    t_social.append(row[15:20])
                     for i in range(0, len(bool)):
                         if row[20] == bool[i]:
+                            t_client.append(row[0:7])
+                            t_contact.append(row[7:10])
+                            t_duration.append(row[10])
+                            t_other.append(row[11:15])
+                            t_social.append(row[15:20])
                             t_label.append(i * 2 - 1)
                             break
+        print(t, f)
+        while (t < f) and (type != 2):
+            t1 = t
+            for i in range(0, t1):
+                if label[i] == 1:
+                    label.append(label[i])
+                    client.append(client[i])
+                    contact.append(contact[i])
+                    duration.append(duration[i])
+                    other.append(other[i])
+                    social.append(social[i])
+                    t += 1
+                    if t == f:
+                        break
+        print(t, f)
         return client, contact, duration, other, social, label, t_client, t_contact, t_duration, t_other, t_social, t_label
 
 if __name__ == '__main__':
