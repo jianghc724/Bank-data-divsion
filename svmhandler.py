@@ -21,7 +21,7 @@ class SVMHandler():
 
     def getData(self, path):
         loader = CSVLoader()
-        self.data, self.contact, self.duration, self.other, self.social, self.label, self.t_data, self.t_contact, self.t_duration, self.t_other, self.t_social, self.t_label = loader.getData('bank-additional.csv')
+        self.data, self.contact, self.duration, self.other, self.social, self.label, self.t_data, self.t_contact, self.t_duration, self.t_other, self.t_social, self.t_label = loader.getData(path)
 
     def train_gd(self, learning_rate=0.01, epoch=1000, c=1, gamma=0.1):
         x = np.asarray(self.data, np.float32)
@@ -30,7 +30,8 @@ class SVMHandler():
         self.alpha = np.zeros(len(x))
         self.b = 0.
         for i in range(0, epoch):
-            print("Epoch:", i)
+            if i % 100 == 0:
+                print("Epoch:", i)
             e = - y * (self.alpha.dot(k) + self.b)
             if np.max(e) < 0:
                 continue
@@ -55,7 +56,8 @@ class SVMHandler():
         self.alpha = np.zeros(len(x))
         self.b = 0.
         for i in range(0, epoch):
-            print("Epoch:", i)
+            if i % 100 == 0:
+                print("Epoch:", i)
             e = - y * (self.alpha.dot(k) + self.b)
             if np.max(e) < 0:
                 continue
@@ -153,12 +155,12 @@ class SVMHandler():
         print("Accuracy:", float(correct) / float(n))
 
 if __name__ == '__main__':
-    # gd = SVMHandler()
-    # gd.getData('bank-additional.csv')
-    # gd.train_gd()
-    # gd.test()
+    gd = SVMHandler()
+    gd.getData('bank-additional-full.csv')
+    gd.train_gd()
+    gd.test()
     perp = SVMHandler()
-    perp.getData('bank-additional.csv')
+    perp.getData('bank-additional-full.csv')
     perp.train_perp()
     perp.test()
     # smo = SVMHandler()
